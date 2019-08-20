@@ -57,12 +57,11 @@ public class FactionCommands {
         CommandSender s = c.getSender();
         String[] args = c.getArgs();
         List<Faction> f = Faction.getFactions(args[0]);
-        if(f == null || f.isEmpty()) {
+        if(f.size() == 0) {
             s.sendMessage("fac not found");
             return;
         }
-        f.forEach(Faction::sendInfo);
-        s.sendMessage(f.getName() + " - " + (f.isSystem() ? "System Faction" : "Leader: " + f.getLeader()));
+        f.forEach(faction -> faction.sendInfo(s));
     }
 
     @Command(name = "f.test", aliases = {"faction.test", "team.test", "t.test", "fac.test"}, fancyUsageMessage = true, minArg = 1, usage = "test <msg...>", description = "Send a test message")

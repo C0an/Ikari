@@ -6,6 +6,7 @@ import club.coan.ikari.faction.flags.Flags;
 import lombok.Data;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -13,6 +14,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 public class Faction {
@@ -44,13 +46,17 @@ public class Faction {
         return flags.contains(Flags.SYSTEM);
     }
 
-    public Set<UUID> getAllMembers() {
-        Set<UUID> facMembers = new HashSet<>();
+    public List<UUID> getAllMembers() {
+        List<UUID> facMembers = new ArrayList<>();
         facMembers.add(leader);
         facMembers.addAll(coleaders);
         facMembers.addAll(captains);
         facMembers.addAll(members);
         return facMembers;
+    }
+
+    public List<UUID> getOnlineMembers() {
+        return getAllMembers().stream().filter(u -> Bukkit.getOfflinePlayer(u).isOnline()).collect(Collectors.toList());
     }
 
     public static Faction getFactionOf(UUID uuid) {
@@ -74,11 +80,11 @@ public class Faction {
      */
     public static List<Faction> getFactions(String f) {
         List<Faction> facs = new ArrayList<>();
-        factions.forEach(fac ->
-        {
+        factions.forEach(fac -> {
             for(UUID uid : fac.getAllMembers()){
+                if(uid == null) continue;
                 OfflinePlayer p = Bukkit.getOfflinePlayer(uid);
-                if(p.getName() == null) continue;
+                if(p == null || p.getName() == null) continue;
                 if(p.getName().equalsIgnoreCase(f)){
                     facs.add(fac);
                 }
@@ -129,6 +135,14 @@ public class Faction {
         return Relation.ENEMY;
     }
 
+    public String getOnlineName(UUID uuid) {
+        if(getOnlineMembers().contains(uuid)) {
+            return "§a" + Bukkit.getOfflinePlayer(uuid).getName();
+        }else {
+            return "§7" + Bukkit.getOfflinePlayer(uuid).getName();
+        }
+    }
+
     public String getRelationDisplay(UUID player, Faction faction) {
         if (player == null) return "§e" + faction.getName();
         switch (faction.getRelationTo(player)) {
@@ -148,10 +162,42 @@ public class Faction {
 
     }
 
-    public void sendInfo(Player p) {
+    public String getOnlineCaptainFormatted() {
+        HashSet<String> format = new HashSet<>();
+        for(UUID u : getCaptains()) {
+            format.add(getOnlineName(u) + ChatColor.YELLOW + "[" + ChatColor.GREEN + "0" + ChatColor.YELLOW + "]");
+        }
+        return StringUtils.join(format, ChatColor.GRAY + ", ");
+    }
+
+    public String getOnlineColeadersFormatted() {
+        HashSet<String> format = new HashSet<>();
+        for(UUID u : getColeaders()) {
+            format.add(getOnlineName(u) + ChatColor.YELLOW + "[" + ChatColor.GREEN + "0" + ChatColor.YELLOW + "]");
+        }
+        return StringUtils.join(format, ChatColor.GRAY + ", ");
+    }
+
+    public String getOnlineMembersFormatted() {
+        HashSet<String> format = new HashSet<>();
+        for(UUID u : getOnlineMembers()) {
+            format.add(getOnlineName(u) + ChatColor.YELLOW + "[" + ChatColor.GREEN + "0" + ChatColor.YELLOW + "]");
+        }
+        return StringUtils.join(format, ChatColor.GRAY + ", ");
+    }
+
+    public void sendInfo(CommandSender p) {
         p.sendMessage("§7§m-----------------------------------------");
-        p.sendMessage(getRelationDisplay(p.getUniqueId(), this));
+        p.sendMessage(getRelationDisplay((p instanceof Player ? ((Player)p).getUniqueId() : null), this) + (!isSystem() ? "[" + getOnlineMembers().size() + "/" + getAllMembers().size() + "]" : ""));
         p.sendMessage("§7§m-----------------------------------------");
+        if(isSystem()) {
+            p.sendMessage("§eLocation: §f" + (claim == null ? "None" : claim.getCenter().getX() + ", " + claim.getCenter().getZ()));
+        }else {
+            p.sendMessage("§eLeader: " + getOnlineName(leader));
+            if(!coleaders.isEmpty()) p.sendMessage(getOnlineColeadersFormatted());
+            if(!captains.isEmpty()) p.sendMessage(getOnlineCaptainFormatted());
+            if(!members.isEmpty()) p.sendMessage(getOnlineMembersFormatted());
+        }
         p.sendMessage("§7§m-----------------------------------------");
     }
 }
