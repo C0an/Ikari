@@ -1,0 +1,13 @@
+# Available database types: FLATFILE, MONGODB
+
+database: FLATFILE
+
+mongo:
+  host: 127.0.0.1
+  port: 27017
+  database: Ikari
+  auth:
+    enabled: false
+    username: user
+    password: password
+    auth: admin

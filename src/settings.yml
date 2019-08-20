@@ -1,0 +1,48 @@
+settings:
+  server_name: Ikari
+  map: Beta
+  # Server Types are custom made types defined by you, make your own server type in the "Server Types" section below.
+  servertype: kitmap
+
+factions:
+  name:
+    min: 3
+    max: 16
+    blocked:
+      # Blcok if Contain means if a faction name contains a word in the block list, it will stop the creation of the faction.
+      blockifcontain: true
+      list:
+        - "nigger"
+        - "nigga"
+        - "killyourself"
+        - "kys"
+        - "faggot"
+        - "fag"
+        - "n1gga"
+        - "n1gg3r"
+        - "n1gger"
+  size: 16
+
+servertypes:
+  #
+  # Deathban means if a player will be banned from joining after death.
+  # Natural Regen means if a player can naturally regenerate health.
+  # Lose DTR means if a faction can lose dtr on death.
+  #
+
+  hcf:
+    deathban: true
+    naturalregen: true
+    loseDTR: false
+  kitmap:
+    deathban: false
+    naturalregen: true
+    loseDTR: false
+  uhcf:
+    deathban: true
+    naturalregen: false
+    loseDTR: true
+  uhcfkitmap:
+    deathban: false
+    naturalregen: false
+    loseDTR: false
