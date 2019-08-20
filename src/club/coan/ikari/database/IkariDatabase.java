@@ -8,12 +8,11 @@ import java.util.UUID;
 
 public abstract class IkariDatabase {
 
-    public abstract Set<Faction> getFactionsInDatabase();
-    public abstract Faction getFaction(UUID uuid);
+    public abstract void getFactionsInDatabase(Callback<Set<UUID>> callback);
     public abstract void loadFaction(Callback<Faction> callback);
     public abstract void saveFaction(Callback<Boolean> callback);
     public abstract void deleteFaction(Callback<Boolean> callback);
-    public abstract void startup();
+    public abstract void startup(Callback<Boolean> callback);
     public abstract void shutdown();
 
 

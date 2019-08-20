@@ -10,13 +10,8 @@ import java.util.UUID;
 public class FlatfileDatabase extends IkariDatabase {
 
     @Override
-    public Set<Faction> getFactionsInDatabase() {
-        return null;
-    }
+    public void getFactionsInDatabase(Callback<Set<UUID>> callback) {
 
-    @Override
-    public Faction getFaction(UUID uuid) {
-        return null;
     }
 
     @Override
@@ -35,9 +30,10 @@ public class FlatfileDatabase extends IkariDatabase {
     }
 
     @Override
-    public void startup() {
+    public void startup(Callback<Boolean> callback) {
 
     }
+
 
     @Override
     public void shutdown() {
