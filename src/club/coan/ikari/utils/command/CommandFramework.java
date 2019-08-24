@@ -105,10 +105,10 @@ public class CommandFramework implements CommandExecutor {
 				if(command.fancyUsageMessage() && modArgs.length < command.minArg()) {
 					if(sender instanceof Player) {
 						Player player = (Player)sender;
-						ComponentBuilder cp = new ComponentBuilder(Locale.USAGEMESSAGE.toString().replaceAll("%command%", cmd.getLabel()).replaceAll("%usage%", cmd.getUsage())).event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(Locale.USAGEDESCRIPTION.toString().replaceAll("%description", cmd.getDescription()))));
+						ComponentBuilder cp = new ComponentBuilder(Locale.USAGEMESSAGE.toString().replace("%command%", cmd.getLabel()).replace("%usage%", cmd.getUsage())).event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(Locale.USAGEDESCRIPTION.toString().replace("%description%", cmd.getDescription()))));
 						player.spigot().sendMessage(cp.create());
 					}else {
-						sender.sendMessage(Locale.USAGEMESSAGE.toString().replaceAll("%command%", cmd.getLabel()).replaceAll("%usage%", cmd.getUsage()) + " §7❘ " + Locale.USAGEDESCRIPTION.toString().replaceAll("%description%", cmd.getUsage()));
+						sender.sendMessage(Locale.USAGEMESSAGE.toString().replace("%command%", cmd.getLabel()).replace("%usage%", cmd.getUsage()) + " §7❘ " + Locale.USAGEDESCRIPTION.toString().replace("%description%", cmd.getUsage()));
 					}
 					return true;
 				}

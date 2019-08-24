@@ -1,8 +1,11 @@
 package club.coan.ikari.faction;
 
+import club.coan.ikari.Ikari;
 import club.coan.ikari.faction.claim.Claim;
 import club.coan.ikari.faction.enums.Relation;
+import club.coan.ikari.faction.enums.Role;
 import club.coan.ikari.faction.flags.Flags;
+import club.coan.ikari.utils.Callback;
 import lombok.Data;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
@@ -14,6 +17,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Data
@@ -30,7 +34,8 @@ public class Faction {
     private ArrayList<Flags> flags = new ArrayList<>();
     private Set<UUID> coleaders = new HashSet<>(), captains = new HashSet<>(), members = new HashSet<>(), allies = new HashSet<>(), invites = new HashSet<>();
     private double dtr = 1.01;
-    private int dtrRegen = 0, balance = 0, kothCaptures = 0, lives = 0;
+    private long dtrRegen = 0L;
+    private int balance = 0, kothCaptures = 0, lives = 0;
 
     public Faction(UUID uuid, String name, UUID leader) {
         this.uuid = uuid;
@@ -42,8 +47,62 @@ public class Faction {
         factions.add(this);
     }
 
+    public static void loadFactions() {
+        Ikari.getIkariDatabase().getFactionsInDatabase(callback-> {
+            callback.forEach(uuid -> {
+                Ikari.getIkariDatabase().loadFaction(uuid, callback1 -> {
+                    if(callback1 == null) {
+                        System.out.println("[Ikari] Failed to load Faction: " + uuid.toString());
+                    }
+                }, false);
+            });
+        });
+    }
+
+    public static void saveAll(Callback<String> callback) {
+        AtomicInteger failed = new AtomicInteger();
+        AtomicInteger saved = new AtomicInteger();
+        int total = (int) Faction.getFactions().stream().filter(faction -> !faction.getFlags().contains(Flags.NO_SAVE)).count();
+        for (Faction faction : Faction.getFactions()) {
+            if(faction.getFlags().contains(Flags.NO_SAVE)) continue;
+             faction.save(callback1 -> {
+                if(callback1 == null || !callback1) {
+                    failed.getAndIncrement();
+                }else {
+                    saved.getAndIncrement();
+                }
+            });
+        }
+        while ((failed.get() + saved.get()) < total) {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException ignored) {}
+        }
+        callback.call(ChatColor.GREEN + "Saved " + saved.get() + " factions, failed to save " + failed.get() + " factions.");
+    }
+
     public boolean isSystem() {
         return flags.contains(Flags.SYSTEM);
+    }
+
+    public void disband() {
+        sendMessage("&c&lThe faction has been disbanded.");
+        Ikari.getIkariDatabase().deleteFaction(this, callback -> {
+            if(callback) {
+                System.out.println("[Ikari] Deleted the team " + getName() + " from the database.");
+            }else {
+                System.out.println("[Ikari] Failed to delete team " + getName() + " from the database.");
+            }
+        }, true);
+    }
+
+
+    public Role getRole(UUID uuid) {
+        if(members.contains(uuid)) return Role.MEMBER;
+        if(captains.contains(uuid)) return Role.CAPTAIN;
+        if(coleaders.contains(uuid)) return Role.COLEADER;
+        if(leader.equals(uuid)) return Role.LEADER;
+        return Role.MEMBER;
     }
 
     public List<UUID> getAllMembers() {
@@ -53,6 +112,10 @@ public class Faction {
         facMembers.addAll(captains);
         facMembers.addAll(members);
         return facMembers;
+    }
+
+    public void save(Callback<Boolean> callback1) {
+        Ikari.getIkariDatabase().saveFaction(this, callback1, true);
     }
 
     public List<UUID> getOnlineMembers() {
@@ -72,13 +135,17 @@ public class Faction {
     }
 
     public static Faction getFaction(String name) {
-        return factions.stream().filter(faction -> faction.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        return factions.stream().filter(faction -> faction.getName().equalsIgnoreCase(name) && !faction.getFlags().contains(Flags.OVERRIDE_NAME)).findFirst().orElse(null);
+    }
+
+    public void sendMessage(String msg) {
+        getOnlineMembers().forEach(on -> Bukkit.getPlayer(on).sendMessage(ChatColor.translateAlternateColorCodes('&', msg)));
     }
 
     /*/
         Credit to D0an
      */
-    public static List<Faction> getFactions(String f) {
+    public static List<Faction> getFactions(String f, boolean hideUnwhoable) {
         List<Faction> facs = new ArrayList<>();
         factions.forEach(fac -> {
             for(UUID uid : fac.getAllMembers()){
@@ -91,8 +158,12 @@ public class Faction {
             }
         });
         Faction named = getFaction(f);
-        if(named != null && !facs.contains(named)) facs.add(named);
+        if(named != null && !facs.contains(named) && (hideUnwhoable && !named.getFlags().contains(Flags.HIDE_FACTION_INFO))) facs.add(named);
         return facs;
+    }
+
+    public static List<Faction> getFactions(String f) {
+        return getFactions(f, false);
     }
 
     public static Faction getFaction(Location loc, boolean player) {
@@ -188,16 +259,20 @@ public class Faction {
 
     public void sendInfo(CommandSender p) {
         p.sendMessage("§7§m-----------------------------------------");
-        p.sendMessage(getRelationDisplay((p instanceof Player ? ((Player)p).getUniqueId() : null), this) + (!isSystem() ? "[" + getOnlineMembers().size() + "/" + getAllMembers().size() + "]" : ""));
-        p.sendMessage("§7§m-----------------------------------------");
         if(isSystem()) {
-            p.sendMessage("§eLocation: §f" + (claim == null ? "None" : claim.getCenter().getX() + ", " + claim.getCenter().getZ()));
+            p.sendMessage(getColor() + getName());
+            p.sendMessage(ChatColor.YELLOW + "Location: " + ChatColor.WHITE + (getClaim() == null ? "None" : getClaim().getCenter().getBlockX() + ", " + getClaim().getCenter().getBlockZ()));
         }else {
-            p.sendMessage("§eLeader: " + getOnlineName(leader));
-            if(!coleaders.isEmpty()) p.sendMessage(getOnlineColeadersFormatted());
-            if(!captains.isEmpty()) p.sendMessage(getOnlineCaptainFormatted());
-            if(!members.isEmpty()) p.sendMessage(getOnlineMembersFormatted());
+            p.sendMessage(ChatColor.BLUE + getName() + ' ' + ChatColor.GRAY + "[" + getOnlineMembers().size() + "/" + getAllMembers().size() + "] " + ChatColor.DARK_AQUA + "-" + ChatColor.YELLOW + " HQ: " + ChatColor.WHITE + (getHq() == null ? "None" : getHq().getBlockX() + ", " + getHq().getBlockZ()));
+            p.sendMessage(ChatColor.YELLOW + "Leader: " + getOnlineName(leader) + ChatColor.YELLOW + "[" + ChatColor.GREEN + "0" + ChatColor.YELLOW + "]");
+            if(!coleaders.isEmpty()) p.sendMessage(ChatColor.YELLOW + "Co-Leaders: " + getOnlineColeadersFormatted());
+            if(!captains.isEmpty()) p.sendMessage(ChatColor.YELLOW + "Captains: " + getOnlineCaptainFormatted());
+            if(!members.isEmpty()) p.sendMessage(ChatColor.YELLOW + "Members: " + getOnlineMembersFormatted());
+            p.sendMessage(ChatColor.YELLOW + "Balance: " + ChatColor.BLUE + "$" + getBalance());
+            p.sendMessage(ChatColor.YELLOW + "Deaths until Raidable: " + ChatColor.GREEN + getDtr());
+            if(dtrRegen != 0) p.sendMessage(ChatColor.YELLOW + "Time Until Regen: " + ChatColor.GREEN + getDtrRegen());
         }
         p.sendMessage("§7§m-----------------------------------------");
+
     }
 }

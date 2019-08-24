@@ -16,10 +16,16 @@ public class IkariSettings {
         mongoUser = c.getString("mongo.auth.username", "user");
         mongoPassword = c.getString("mongo.auth.password", "password");
         mongoAuthDatabase = c.getString("mongo.auth.auth", "admin");
+
+        c = Ikari.getInstance().getSettingsFile();
+        serverName = c.getString("settings.server_name");
+        map = c.getString("settings.map");
     }
 
     @Getter public static String mongoHost, mongoDatabase, mongoUser, mongoAuthDatabase, mongoPassword;
     @Getter public static int mongoPort;
     @Getter public static boolean mongoAuth;
+
+    @Getter public static String serverName, map;
 
 }

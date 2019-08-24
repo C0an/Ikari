@@ -15,17 +15,17 @@ public class FlatfileDatabase extends IkariDatabase {
     }
 
     @Override
-    public void loadFaction(Callback<Faction> callback) {
+    public void loadFaction(UUID uuid, Callback<Faction> callback, boolean async) {
 
     }
 
     @Override
-    public void saveFaction(Callback<Boolean> callback) {
+    public void saveFaction(Faction faction, Callback<Boolean> callback, boolean async) {
 
     }
 
     @Override
-    public void deleteFaction(Callback<Boolean> callback) {
+    public void deleteFaction(Faction faction, Callback<Boolean> callback, boolean async) {
 
     }
 

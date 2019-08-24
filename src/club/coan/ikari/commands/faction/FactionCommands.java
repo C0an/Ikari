@@ -7,6 +7,7 @@ import club.coan.ikari.utils.command.Command;
 import club.coan.ikari.utils.command.CommandArgs;
 import club.coan.ikari.utils.command.Completer;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -35,6 +36,14 @@ public class FactionCommands {
             return;
         }
         f = new Faction(UUID.randomUUID(), args[0], p.getUniqueId());
+
+        f.save(callback -> {
+            if(callback) {
+                System.out.println("[Ikari] Saved faction " + args[0] + " to the database.");
+            }else {
+                System.out.println("[Ikari] Failed to save the faction " + args[0] + " to the database.");
+            }
+        });
         p.sendMessage("§akek made faction by name " + f.getName() + "!");
     }
 
@@ -52,11 +61,26 @@ public class FactionCommands {
         p.sendMessage("§akek made system faction by name " + f.getName() + "!");
     }
 
-    @Command(name = "f.who", minArg = 1)
+    @Command(name = "f.disband", aliases = {"faction.disband", "fac.disband", "team.disband", "t.disband"}, description = "Disband your faction", inGameOnly = true)
+    public void disbandCmd(CommandArgs c) {
+        Player p = c.getPlayer();
+        Faction f = Faction.getFactionOf(p);
+        if(f == null) {
+            p.sendMessage("§cur not in faction kek");
+            return;
+        }
+        if(!f.getLeader().toString().equals(p.getUniqueId().toString())) {
+            p.sendMessage(ChatColor.RED + "Only leaders can disband factions.");
+            return;
+        }
+        f.disband();
+    }
+
+    @Command(name = "f.who", minArg = 1, fancyUsageMessage = true, usage = "who <faction>", description = "Information bout fac kek")
     public void whoCmd(CommandArgs c) {
         CommandSender s = c.getSender();
         String[] args = c.getArgs();
-        List<Faction> f = Faction.getFactions(args[0]);
+        List<Faction> f = Faction.getFactions(args[0], true);
         if(f.size() == 0) {
             s.sendMessage("fac not found");
             return;
@@ -64,27 +88,12 @@ public class FactionCommands {
         f.forEach(faction -> faction.sendInfo(s));
     }
 
-    @Command(name = "f.test", aliases = {"faction.test", "team.test", "t.test", "fac.test"}, fancyUsageMessage = true, minArg = 1, usage = "test <msg...>", description = "Send a test message")
-    public void testCmd(CommandArgs c) {
+    @Command(name = "f.save", aliases = {"faction.save", "fac.save", "t.save", "team.save"}, description = "Save all factions")
+    public void saveCmd(CommandArgs c) {
         CommandSender s = c.getSender();
-        String msg = StringUtils.join(c.getArgs(), ' ');
-        s.sendMessage("§cThis is a test command, hello " + c.getFormattedDisplayName());
-        s.sendMessage("§a" + msg);
-        s.sendMessage(Locale.USAGEMESSAGE.toString().replaceAll("%command%", c.getCommand().getLabel()).replaceAll("%usage%", c.getCommand().getUsage()));
-        s.sendMessage(Locale.USAGEMESSAGE.toString());
+        org.bukkit.command.Command.broadcastCommandMessage(s, "Performed a save task.");
+        new Thread(() -> Faction.saveAll(callback -> org.bukkit.command.Command.broadcastCommandMessage(s, callback))).start();
     }
 
-    @Completer(name = "f.test", aliases = {"faction.test", "team.test", "t.test", "fac.  test"})
-    public List<String> testCmpltr(CommandArgs c) {
-        List<String> list = new ArrayList<>();
-        if(c.getArgs().length == 0) {
-            return null;
-        }else {
-            list.add("Hi, my name is " + c.getSender().getName());
-            list.add("Oh, did you know that tab completion works?");
-            list.add("Cool!");
-        }
-        return list;
-    }
 
 }
