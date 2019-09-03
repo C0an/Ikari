@@ -2,7 +2,9 @@ settings:
   server_name: Ikari
   map: Beta
   # Server Types are custom made types defined by you, make your own server type in the "Server Types" section below.
+  # You can also live-set ServerTypes by doing /servertype <type>
   servertype: kitmap
+  serverCurrency: £
 
 factions:
   name:
@@ -22,6 +24,7 @@ factions:
         - "n1gg3r"
         - "n1gger"
   size: 16
+  maxdtr: 6.5
 
 servertypes:
   #
@@ -29,20 +32,34 @@ servertypes:
   # Natural Regen means if a player can naturally regenerate health.
   # Lose DTR means if a faction can lose dtr on death.
   #
-
   hcf:
     deathban: true
-    naturalregen: true
+    naturalRegen: true
     loseDTR: false
+    instantRespawn: false
+    startingBalance: 250
+    playerDataOnSB: false
+
   kitmap:
     deathban: false
-    naturalregen: true
+    naturalRegen: true
     loseDTR: false
+    instantRespawn: true
+    startingBalance: 500
+    playerDataOnSB: true
+
   uhcf:
     deathban: true
-    naturalregen: false
+    naturalRegen: false
     loseDTR: true
+    instantRespawn: false
+    startingBalance: 250
+    playerDataOnSB: false
+
   uhcfkitmap:
     deathban: false
-    naturalregen: false
+    naturalRegen: false
     loseDTR: false
+    instantRespawn: true
+    startingBalance: 500
+    playerDataOnSB: true

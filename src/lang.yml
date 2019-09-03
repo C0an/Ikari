@@ -1,8 +1,0 @@
-command:
-  nopermission: "&cNo permission."
-  ingameonly: "&cThis command can only be used in game!"
-  inconsoleonly: "&cThis command is only accessable by CONSOLE."
-  usage:
-    message: "&cUsage: /%command% %usage%"
-    description: "&e%description%"
-  incorrectsetup: "&c/%command% was not setup correctly, please contact an Owner or Developer."

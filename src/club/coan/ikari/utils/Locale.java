@@ -7,12 +7,7 @@ import org.bukkit.ChatColor;
 @Getter
 public enum Locale {
 
-    NOPERMISSION("command.nopermission"),
-    INGAMEONLY("command.ingameonly"),
-    INCONSOLEONLY("command.inconsoleonly"),
-    USAGEMESSAGE("command.usage.message"),
-    USAGEDESCRIPTION("command.usage.description"),
-    INCORRECTSETUP("command.incorrectsetup");
+    YES("yes");
 
     private String path;
 

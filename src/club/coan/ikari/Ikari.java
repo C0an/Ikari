@@ -1,5 +1,7 @@
 package club.coan.ikari;
 
+import club.coan.ikari.commands.admin.ServerTypeCommands;
+import club.coan.ikari.commands.faction.FactionAdminCommands;
 import club.coan.ikari.commands.faction.FactionCommands;
 import club.coan.ikari.config.IkariSettings;
 import club.coan.ikari.database.IkariDatabase;
@@ -9,10 +11,12 @@ import club.coan.ikari.faction.Faction;
 import club.coan.ikari.faction.claim.Claim;
 import club.coan.ikari.faction.flags.Flags;
 import club.coan.ikari.scoreboard.ScoreboardImplementor;
-import club.coan.ikari.utils.Config;
-import club.coan.ikari.utils.Util;
-import club.coan.ikari.utils.command.CommandFramework;
-import club.coan.ikari.utils.scoreboard.Assemble;
+import club.coan.ikari.utils.ServerType;
+import club.coan.rinku.command.CommandFramework;
+import club.coan.rinku.config.Config;
+import club.coan.rinku.other.BukkitUtils;
+import club.coan.rinku.other.Callback;
+import club.coan.rinku.scoreboard.Assemble;
 import com.google.common.collect.ImmutableSet;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
@@ -22,6 +26,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.UUID;
 
 public class Ikari extends JavaPlugin {
@@ -36,24 +41,27 @@ public class Ikari extends JavaPlugin {
     public void onEnable() {
         instance = this;
         saveDefaultConfig();
-        langFile = new Config("lang");
-        settingsFile = new Config("settings");
+        langFile = new Config(this, "lang");
+        settingsFile = new Config(this, "settings");
         new IkariSettings();
         boolean flatFile = !getConfig().getString("database").equalsIgnoreCase("mongodb");
         ikariDatabase = (flatFile ? new FlatfileDatabase() : new MongoDatabase());
-        if(flatFile) factionFile = new Config("factions");
+        if(flatFile) factionFile = new Config(this, "factions");
         System.out.println("[Ikari] Using database type: " + (flatFile ? "Flat File" : "MongoDB"));
         ikariDatabase.startup(callback -> {
-            if(!callback) {
+            if (!callback) {
                 Bukkit.getPluginManager().disablePlugin(this);
             }
         });
         createSystemFactions();
         Faction.loadFactions();
-        Util.registerListeners(this, "club.coan.ikari.listeners");
+        new ServerType();
+        BukkitUtils.registerListeners(this, "club.coan.ikari.listeners");
         assemble = new Assemble(this, new ScoreboardImplementor());
         commandFramework = new CommandFramework(this);
         commandFramework.registerCommands(new FactionCommands());
+        commandFramework.registerCommands(new FactionAdminCommands());
+        commandFramework.registerCommands(new ServerTypeCommands());
         commandFramework.registerHelp();
 
 
@@ -76,4 +84,7 @@ public class Ikari extends JavaPlugin {
         f.setFlags(new ArrayList<>(ImmutableSet.of(Flags.SYSTEM, Flags.NO_SAVE, Flags.HIDE_FACTION_INFO, Flags.OVERRIDE_NAME)));
         f.setClaim(new Claim(new Location(Bukkit.getWorlds().get(0), -350, 0, 350), new Location(Bukkit.getWorlds().get(0), 350, 256, -350)));
     }
+
+
+
 }

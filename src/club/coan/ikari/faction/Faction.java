@@ -5,7 +5,7 @@ import club.coan.ikari.faction.claim.Claim;
 import club.coan.ikari.faction.enums.Relation;
 import club.coan.ikari.faction.enums.Role;
 import club.coan.ikari.faction.flags.Flags;
-import club.coan.ikari.utils.Callback;
+import club.coan.rinku.other.Callback;
 import lombok.Data;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
@@ -49,6 +49,10 @@ public class Faction {
 
     public static void loadFactions() {
         Ikari.getIkariDatabase().getFactionsInDatabase(callback-> {
+            if(callback == null) {
+                System.out.println("[Ikari] Failed to load any factions - maybe there is none made?");
+                return;
+            }
             callback.forEach(uuid -> {
                 Ikari.getIkariDatabase().loadFaction(uuid, callback1 -> {
                     if(callback1 == null) {

@@ -1,15 +1,18 @@
 package club.coan.ikari.database.types;
 
+import club.coan.ikari.Ikari;
 import club.coan.ikari.config.IkariSettings;
 import club.coan.ikari.database.IkariDatabase;
 import club.coan.ikari.faction.Faction;
 import club.coan.ikari.faction.flags.Flags;
-import club.coan.ikari.utils.Callback;
+import club.coan.rinku.config.Config;
+import club.coan.rinku.other.Callback;
 import com.mongodb.*;
 import com.mongodb.client.model.DBCollectionUpdateOptions;
 import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 
+import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -89,6 +92,7 @@ public class MongoDatabase extends IkariDatabase {
             new Thread(() -> saveFaction(faction, callback, false)).start();
             return;
         }
+
         DBObject object = new BasicDBObjectBuilder()
                 .add("uuid", faction.getUuid().toString())
                 .add("name", faction.getName())
@@ -166,4 +170,27 @@ public class MongoDatabase extends IkariDatabase {
     public void shutdown() {
         mongoClient.close();
     }
+
+    @Override
+    public void backup(String fileName, Callback<Boolean> callback) {
+        File folder = Ikari.getInstance().getDataFolder();
+
+        try {
+            File file = new File(folder, fileName + ".yml");
+            if (file.exists()) {
+                callback.call(false);
+                return;
+            }
+        }catch (Exception e) {
+            callback.call(false);
+            e.printStackTrace();
+            return;
+        }
+
+        Config config = new Config(Ikari.getInstance(), fileName);
+        Faction.getFactions().stream().filter(faction -> !faction.getFlags().contains(Flags.NO_SAVE)).forEach(faction -> FlatfileDatabase.saveFaction(config, faction, callback1 -> {}, false));
+        callback.call(true);
+    }
+
+
 }
