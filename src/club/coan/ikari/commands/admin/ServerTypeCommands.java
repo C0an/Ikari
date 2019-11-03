@@ -3,27 +3,16 @@ package club.coan.ikari.commands.admin;
 import club.coan.ikari.config.IkariSettings;
 import club.coan.ikari.utils.ServerType;
 import club.coan.rinku.command.Command;
-import club.coan.rinku.command.CommandArgs;
+import club.coan.rinku.command.Param;
 import club.coan.rinku.other.BukkitUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 public class ServerTypeCommands {
 
-    @Command(name = "servertype", usage = "<servertype>", description = "Set the active server type", fancyUsageMessage = true, permission = "ikari.servertype")
-    public void sTypeCmd(CommandArgs c) {
-        CommandSender s = c.getSender();
-        s.sendMessage(BukkitUtils.CHAT_STRAIGHT_LINE);
-        s.sendMessage(ChatColor.GOLD + ChatColor.BOLD.toString() + "ServerType Commands");
-        s.sendMessage("");
-        s.sendMessage(ChatColor.YELLOW + c.getCommand().getLabel() + " list " + ChatColor.GRAY + "-" + ChatColor.WHITE + " List all available server types.");
-        s.sendMessage(ChatColor.YELLOW + c.getCommand().getLabel() + " set <servertype> " + ChatColor.GRAY + "-" + ChatColor.WHITE + " Set the active server type");
-        s.sendMessage(BukkitUtils.CHAT_STRAIGHT_LINE);
-    }
 
-    @Command(name = "servertype.list", description = "List all available server types", permission = "ikari.servertype")
-    public void sTypeListCmd(CommandArgs c) {
-        CommandSender s = c.getSender();
+    @Command(names = "servertype list", description = "List all available server types", permission = "ikari.servertype")
+    public static void sTypeListCmd(CommandSender s) {
         s.sendMessage(BukkitUtils.CHAT_STRAIGHT_LINE);
         s.sendMessage(ChatColor.GOLD + ChatColor.BOLD.toString() + "ServerTypes " + ChatColor.GRAY + "(" + ServerType.getServerTypes().size() + ")");
         s.sendMessage("");
@@ -39,15 +28,8 @@ public class ServerTypeCommands {
         s.sendMessage(BukkitUtils.CHAT_STRAIGHT_LINE);
     }
 
-    @Command(name = "servertype.set", description = "Set the active server type", usage = "<servertype>", minArg = 1, fancyUsageMessage = true, permission = "ikari.servertype")
-    public void sTypeSetCmd(CommandArgs c) {
-        CommandSender s = c.getSender();
-        String[] args = c.getArgs();
-        ServerType serverType = ServerType.getServerType(args[0]);
-        if(serverType == null) {
-            s.sendMessage(ChatColor.RED + "There is no such server type with the name \"" + args[0] + "\".");
-            return;
-        }
+    @Command(names = "servertype set", description = "Set the active server type", permission = "ikari.servertype")
+    public static void sTypeSetCmd(CommandSender s, @Param(name = "servertype") ServerType serverType) {
         if(ServerType.getActiveServerType() == serverType) {
             s.sendMessage(ChatColor.RED + "This server type is already active.");
             return;

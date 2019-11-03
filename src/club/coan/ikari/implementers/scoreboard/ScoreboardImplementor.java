@@ -1,7 +1,6 @@
-package club.coan.ikari.scoreboard;
+package club.coan.ikari.implementers.scoreboard;
 
 import club.coan.ikari.config.IkariSettings;
-import club.coan.ikari.faction.Faction;
 import club.coan.ikari.utils.ServerType;
 import club.coan.rinku.scoreboard.AssembleAdapter;
 import org.bukkit.ChatColor;
