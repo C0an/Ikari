@@ -218,24 +218,25 @@ public class Faction {
         }
     }
 
-    public String getRelationDisplay(UUID player, Faction faction) {
+    public String getRelationDisplay(UUID player, Faction faction, boolean factionName) {
         if (player == null) return "§e" + faction.getName();
         switch (faction.getRelationTo(player)) {
             case TEAM: {
-                return "§2" + faction.getName();
+                return "§2" + (factionName ? faction.getName() : "");
             }
             case ENEMY: {
-                return "§e" + faction.getName();
+                return "§e" + (factionName ? faction.getName() : "");
             }
             case ALLY: {
-                return "§9" + faction.getName();
+                return "§9" + (factionName ? faction.getName() : "");
             }
             default: {
-                return faction.getColor() + faction.getName();
+                return faction.getColor()  + (factionName ? faction.getName() : "");
             }
         }
-
     }
+
+
 
     public String getOnlineCaptainFormatted() {
         HashSet<String> format = new HashSet<>();

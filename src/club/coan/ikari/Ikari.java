@@ -12,7 +12,7 @@ import club.coan.ikari.faction.claim.Claim;
 import club.coan.ikari.faction.flags.Flags;
 import club.coan.ikari.scoreboard.ScoreboardImplementor;
 import club.coan.ikari.utils.ServerType;
-import club.coan.rinku.command.CommandFramework;
+import club.coan.rinku.command.RinkuCommandHandler;
 import club.coan.rinku.config.Config;
 import club.coan.rinku.other.BukkitUtils;
 import club.coan.rinku.other.Callback;
@@ -58,11 +58,8 @@ public class Ikari extends JavaPlugin {
         new ServerType();
         BukkitUtils.registerListeners(this, "club.coan.ikari.listeners");
         assemble = new Assemble(this, new ScoreboardImplementor());
-        commandFramework = new CommandFramework(this);
-        commandFramework.registerCommands(new FactionCommands());
-        commandFramework.registerCommands(new FactionAdminCommands());
-        commandFramework.registerCommands(new ServerTypeCommands());
-        commandFramework.registerHelp();
+        RinkuCommandHandler.loadCommandsFromPackage(this, "club.coan.ikari.commands.admin");
+        RinkuCommandHandler.loadCommandsFromPackage(this, "club.coan.ikari.commands.faction");
 
 
     }

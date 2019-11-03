@@ -31,7 +31,7 @@ public class ChatListener implements Listener {
             }
         }
         for (Player r : e.getRecipients()) {
-            String chatFormat = (f == null ? "" : ChatColor.GOLD + "[" + f.getRelationDisplay(r.getUniqueId(), f) + ChatColor.GOLD + "]") + BukkitAPI.getPrefix(p) + BukkitAPI.getColor(p) + p.getName() + BukkitAPI.getSuffix(p) + "§r: " + e.getMessage();
+            String chatFormat = (f == null ? "" : ChatColor.GOLD + "[" + f.getRelationDisplay(r.getUniqueId(), f, true) + ChatColor.GOLD + "]") + BukkitAPI.getPrefix(p) + BukkitAPI.getColor(p) + p.getName() + BukkitAPI.getSuffix(p) + "§r: " + e.getMessage();
             if(blocked) {
                 if(r == p) {
                     r.sendMessage(chatFormat);
