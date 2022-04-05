@@ -7,10 +7,11 @@ import club.coan.ikari.faction.flags.Flags;
 import club.coan.rinku.config.Config;
 import club.coan.rinku.other.Callback;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class FlatfileDatabase extends IkariDatabase {
@@ -45,29 +46,17 @@ public class FlatfileDatabase extends IkariDatabase {
         faction.setDeathban(Boolean.parseBoolean(Ikari.getInstance().getFactionFile().getString("factions." + uuid.toString() + ".deathban")));
         faction.setPvp(Boolean.parseBoolean(Ikari.getInstance().getFactionFile().getString("factions." + uuid.toString() + ".pvp")));
 
-        ((List<String>)Ikari.getInstance().getFactionFile().getStringList("factions." + uuid.toString() + ".flags")).forEach(str->{
-            faction.getFlags().add(Flags.valueOf(str));
-        });
+        Ikari.getInstance().getFactionFile().getStringList("factions." + uuid.toString() + ".flags").forEach(str-> faction.getFlags().add(Flags.valueOf(str)));
 
-        ((List<String>)Ikari.getInstance().getFactionFile().getStringList("factions." + uuid.toString() + ".members")).forEach(id->{
-            faction.getMembers().add(UUID.fromString(id));
-        });
+        Ikari.getInstance().getFactionFile().getStringList("factions." + uuid.toString() + ".members").forEach(id-> faction.getMembers().add(UUID.fromString(id)));
 
-        ((List<String>)Ikari.getInstance().getFactionFile().getStringList("factions." + uuid.toString() + ".captains")).forEach(id->{
-            faction.getCaptains().add(UUID.fromString(id));
-        });
+        Ikari.getInstance().getFactionFile().getStringList("factions." + uuid.toString() + ".captains").forEach(id-> faction.getCaptains().add(UUID.fromString(id)));
 
-        ((List<String>)Ikari.getInstance().getFactionFile().getStringList("factions." + uuid.toString() + ".coleaders")).forEach(id->{
-            faction.getColeaders().add(UUID.fromString(id));
-        });
+        Ikari.getInstance().getFactionFile().getStringList("factions." + uuid.toString() + ".coleaders").forEach(id-> faction.getColeaders().add(UUID.fromString(id)));
 
-        ((List<String>)Ikari.getInstance().getFactionFile().getStringList("factions." + uuid.toString() + ".invites")).forEach(id->{
-            faction.getInvites().add(UUID.fromString(id));
-        });
+        Ikari.getInstance().getFactionFile().getStringList("factions." + uuid.toString() + ".invites").forEach(id-> faction.getInvites().add(UUID.fromString(id)));
 
-        ((List<String>)Ikari.getInstance().getFactionFile().getStringList("factions." + uuid.toString() + ".allies")).forEach(id->{
-            faction.getAllies().add(UUID.fromString(id));
-        });
+        Ikari.getInstance().getFactionFile().getStringList("factions." + uuid.toString() + ".allies").forEach(id-> faction.getAllies().add(UUID.fromString(id)));
 
         faction.setDtr(Ikari.getInstance().getFactionFile().getDouble("factions." + uuid.toString() + ".dtr"));
         faction.setDtrRegen(Ikari.getInstance().getFactionFile().getLong("factions." + uuid.toString() + ".dtrRegen"));

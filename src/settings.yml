@@ -11,7 +11,7 @@ factions:
     min: 3
     max: 16
     blocked:
-      # Blcok if Contain means if a faction name contains a word in the block list, it will stop the creation of the faction.
+      # "Block if Contain" means if a faction name contains a word in the block list, it will stop the creation of the faction.
       blockifcontain: true
       list:
         - "nigger"
@@ -23,6 +23,10 @@ factions:
         - "n1gga"
         - "n1gg3r"
         - "n1gger"
+        - "nignog"
+        - "n1gnog"
+        - "nign0g"
+        - "n1gn0g"
   size: 16
   maxdtr: 6.5
 

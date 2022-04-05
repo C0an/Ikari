@@ -28,10 +28,10 @@ public class FactionAdminCommands {
         p.sendMessage("§aCreated a System Faction with the name \"" + f.getName() + "\", to add flags to the team do /flags.");
     }
 
-    @Command(names = {"faction forcesave", "f forcesave","fac forcesave", "t forcesave", "team forcesave"}, description = "Save all factions", permission = "ikari.forcesave")
+    @Command(names = {"faction forcesave", "f forcesave","fac forcesave", "t forcesave", "team forcesave"}, description = "Save all factions", permission = "ikari.forcesave", async = true)
     public static void saveCmd(CommandSender s) {
         RinkuCommand.broadcastCommandMessage(s, "Performed a save task.");
-        new Thread(() -> Faction.saveAll(callback -> org.bukkit.command.Command.broadcastCommandMessage(s, callback))).start();
+        Faction.saveAll(callback -> org.bukkit.command.Command.broadcastCommandMessage(s, callback));
     }
 
     @Command(names ={"faction backup", "f backup","fac backup", "t backup", "team backup"}, description = "Create a backup file", permission = "ikari.backup")
@@ -39,9 +39,9 @@ public class FactionAdminCommands {
         RinkuCommand.broadcastCommandMessage(s, "Creating a backup with the name \"" + name + "\".");
         Ikari.getIkariDatabase().backup(name, callback -> {
             if(!callback) {
-                org.bukkit.command.Command.broadcastCommandMessage(s, ChatColor.RED + "Failed to create the backup \"" + name + "\", maybe it already exists?");
+                RinkuCommand.broadcastCommandMessage(s, ChatColor.RED + "Failed to create the backup \"" + name + "\", maybe it already exists?");
             }else {
-                org.bukkit.command.Command.broadcastCommandMessage(s, ChatColor.GREEN + "Successfully created a backup with the name \"" + name + "\".");
+                RinkuCommand.broadcastCommandMessage(s, ChatColor.GREEN + "Successfully created a backup with the name \"" + name + "\".");
             }
         });
     }

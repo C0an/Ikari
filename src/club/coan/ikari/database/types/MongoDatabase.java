@@ -53,29 +53,17 @@ public class MongoDatabase extends IkariDatabase {
         faction.setDeathban(Boolean.parseBoolean(storedFaction.get("deathban").toString()));
         faction.setPvp(Boolean.parseBoolean(storedFaction.get("pvp").toString()));
 
-        ((List<String>)storedFaction.get("flags")).forEach(str->{
-            faction.getFlags().add(Flags.valueOf(str));
-        });
+        ((List<String>)storedFaction.get("flags")).forEach(str-> faction.getFlags().add(Flags.valueOf(str)));
 
-        ((List<String>)storedFaction.get("members")).forEach(id->{
-            faction.getMembers().add(UUID.fromString(id));
-        });
+        ((List<String>)storedFaction.get("members")).forEach(id-> faction.getMembers().add(UUID.fromString(id)));
 
-        ((List<String>)storedFaction.get("captains")).forEach(id->{
-            faction.getCaptains().add(UUID.fromString(id));
-        });
+        ((List<String>)storedFaction.get("captains")).forEach(id-> faction.getCaptains().add(UUID.fromString(id)));
 
-        ((List<String>)storedFaction.get("coleaders")).forEach(id->{
-            faction.getColeaders().add(UUID.fromString(id));
-        });
+        ((List<String>)storedFaction.get("coleaders")).forEach(id-> faction.getColeaders().add(UUID.fromString(id)));
 
-        ((List<String>)storedFaction.get("invites")).forEach(id->{
-            faction.getInvites().add(UUID.fromString(id));
-        });
+        ((List<String>)storedFaction.get("invites")).forEach(id-> faction.getInvites().add(UUID.fromString(id)));
 
-        ((List<String>)storedFaction.get("allies")).forEach(id->{
-            faction.getAllies().add(UUID.fromString(id));
-        });
+        ((List<String>)storedFaction.get("allies")).forEach(id-> faction.getAllies().add(UUID.fromString(id)));
 
         faction.setDtr(Double.parseDouble(storedFaction.get("dtr").toString()));
         faction.setDtrRegen(Integer.parseInt(storedFaction.get("dtrRegen").toString()));
